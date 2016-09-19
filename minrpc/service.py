@@ -112,9 +112,8 @@ class Service(object):
 
     def _reply_exception(self, exc_info):
         """Return an exception state to the client."""
-        message = exc_info[0](
-            "\n" + "".join(traceback.format_exception(*exc_info))),
-        self._conn.send(('exception', message))
+        message = "".join(traceback.format_exception(*exc_info))
+        self._conn.send(('exception', (exc_info[0], message)))
 
 
 if __name__ == '__main__':

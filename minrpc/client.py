@@ -98,9 +98,9 @@ class Client(object):
         handler = getattr(self, '_dispatch_%s' % (kind,))
         return handler(*args)
 
-    def _dispatch_exception(self, exc_info):
+    def _dispatch_exception(self, exc_type, message):
         """Dispatch an exception."""
-        raise exc_info
+        raise Exception(exc_type.__name__ + "\n" + message)
 
     def _dispatch_data(self, data):
         """Dispatch returned data."""
