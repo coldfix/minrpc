@@ -1,5 +1,5 @@
 minrpc
-======
+------
 
 |Version| |License| |Python| |Build| |Coverage|
 

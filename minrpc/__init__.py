@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 __title__ = 'minrpc'
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 
 __summary__ = 'Minimalistic RPC utility (DO NOT USE!)'
 __uri__ = 'https://github.com/hibtc/minrpc'
