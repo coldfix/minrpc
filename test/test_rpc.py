@@ -5,9 +5,6 @@ import os
 import subprocess
 import unittest
 
-# utilities
-import _compat
-
 # tested modules
 from minrpc.client import Client
 
