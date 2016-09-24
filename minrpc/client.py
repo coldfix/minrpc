@@ -100,7 +100,11 @@ class Client(object):
 
     def _dispatch_exception(self, exc_type, message):
         """Dispatch an exception."""
-        raise Exception(exc_type.__name__ + "\n" + message)
+        # Raise a wrapper exception type to avoid problems if the constructor
+        # expects a different arguments than a message string:
+        raise type(exc_type.__name__, (exc_type,), {
+            '__str__': lambda *args: message,
+            '__init__': lambda *args: None})
 
     def _dispatch_data(self, data):
         """Dispatch returned data."""

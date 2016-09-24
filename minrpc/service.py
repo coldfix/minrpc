@@ -83,7 +83,7 @@ class Service(object):
         handler = getattr(self, '_dispatch_%s' % (kind,))
         try:
             response = handler(*args)
-        except:
+        except Exception:
             self._reply_exception(sys.exc_info())
         else:
             try:
