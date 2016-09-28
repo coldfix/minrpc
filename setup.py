@@ -27,7 +27,7 @@ def get_long_description():
     long_description = None
     try:
         long_description = read_file('README.rst').decode('utf-8')
-        long_description += '\n' + read_file('COPYING.GPLv3.rst').decode('utf-8')
+        long_description += '\n' + read_file('COPYING.rst').decode('utf-8')
         long_description += '\n' + read_file('CHANGES.rst').decode('utf-8')
     except (IOError, UnicodeDecodeError):
         pass
