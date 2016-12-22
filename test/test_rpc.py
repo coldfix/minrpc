@@ -3,6 +3,7 @@ from __future__ import absolute_import
 # standard library
 import os
 import subprocess
+import tempfile
 import unittest
 
 # tested modules
@@ -16,20 +17,18 @@ class TestRPC(unittest.TestCase):
     # TODO: change this test such that it checks "directly" whether the file
     # handle is still open.
     def test_no_leaking_file_handles(self):
-        test_filename = 'foobar'
-        f = open(test_filename, 'w')
-        print(f.fileno())
+        fd, filename = tempfile.mkstemp()
         svc, proc = Client.spawn_subprocess()
-        f.close()
+        os.close(fd)
         try:
-            os.remove(test_filename)
+            os.remove(filename)
             file_can_be_deleted = True
         except OSError:
             file_can_be_deleted = False
         svc.close()
         proc.wait()
         if not file_can_be_deleted:
-            os.remove(test_filename)
+            os.remove(filename)
         self.assertTrue(file_can_be_deleted)
 
     # TODO: add tests to check that other resources get closed correctly.
