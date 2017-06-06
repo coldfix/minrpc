@@ -2,6 +2,22 @@
 Utilities for use with remote processes.
 """
 
+import sys
+
+
+__all__ = [
+    'OrderedDict',
+    'ChangeDirectory',
+]
+
+
+# dictionary type that preserves insertion order if not deleting an element.
+# (this is technically just an implementation detail of CPython 3.6)
+if sys.version_info >= (3, 6):
+    OrderedDict = dict
+else:
+    from collections import OrderedDict
+
 
 class ChangeDirectory(object):
 
