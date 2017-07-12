@@ -41,6 +41,7 @@ class Client(object):
     def __init__(self, conn):
         """Initialize the client with a :class:`Connection` like object."""
         self._conn = conn
+        self._good = True
 
     def __del__(self):
         """Close the client and the associated connection with it."""
@@ -49,6 +50,11 @@ class Client(object):
         except (RemoteProcessCrashed, RemoteProcessClosed):
             # catch ugly follow-up warnings after a MAD-X process has crashed
             pass
+
+    def __bool__(self):
+        return self._good and not self.closed
+
+    __nonzero__ = __bool__
 
     @classmethod
     def spawn_subprocess(cls, **Popen_args):
@@ -85,11 +91,14 @@ class Client(object):
                 raise RemoteProcessClosed()
             raise
         except IOError:
+            self._good = False
             raise RemoteProcessCrashed()
         try:
             response = self._conn.recv()
         except EOFError:
+            self._good = False
             raise RemoteProcessCrashed()
+        self._good = True
         return self._dispatch(response)
 
     def _dispatch(self, response):
