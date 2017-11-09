@@ -16,6 +16,14 @@ __all__ = [
 ]
 
 
+# Needed for py2 compatibility, otherwise could just use contextlib.ExitStack:
+class NoLock(object):
+    def __enter__(self):
+        pass
+    def __exit__(self, *args):
+        pass
+
+
 class RemoteProcessClosed(RuntimeError):
     """The MAD-X remote process has already been closed."""
     pass
@@ -38,10 +46,11 @@ class Client(object):
 
     module = 'minrpc.service'
 
-    def __init__(self, conn):
+    def __init__(self, conn, lock=None):
         """Initialize the client with a :class:`Connection` like object."""
         self._conn = conn
         self._good = True
+        self._lock = lock or NoLock()
 
     def __del__(self):
         """Close the client and the associated connection with it."""
@@ -57,7 +66,7 @@ class Client(object):
     __nonzero__ = __bool__
 
     @classmethod
-    def spawn_subprocess(cls, **Popen_args):
+    def spawn_subprocess(cls, lock=None, **Popen_args):
         """
         Create client for a backend service in a subprocess.
 
@@ -67,7 +76,7 @@ class Client(object):
         """
         args = [sys.executable, '-m', cls.module]
         conn, proc = ipc.spawn_subprocess(args, **Popen_args)
-        return cls(conn), proc
+        return cls(conn, lock=lock), proc
 
     def close(self):
         """Close the connection gracefully, stop the remote service."""
@@ -84,21 +93,22 @@ class Client(object):
 
     def _request(self, kind, *args):
         """Communicate with the remote service synchronously."""
-        try:
-            self._conn.send((kind, args))
-        except ValueError:
-            if self.closed:
-                raise RemoteProcessClosed()
-            raise
-        except IOError:
-            self._good = False
-            raise RemoteProcessCrashed()
-        try:
-            response = self._conn.recv()
-        except EOFError:
-            self._good = False
-            raise RemoteProcessCrashed()
-        self._good = True
+        with self._lock:
+            try:
+                self._conn.send((kind, args))
+            except ValueError:
+                if self.closed:
+                    raise RemoteProcessClosed()
+                raise
+            except IOError:
+                self._good = False
+                raise RemoteProcessCrashed()
+            try:
+                response = self._conn.recv()
+            except EOFError:
+                self._good = False
+                raise RemoteProcessCrashed()
+            self._good = True
         return self._dispatch(response)
 
     def _dispatch(self, response):
