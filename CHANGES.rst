@@ -4,6 +4,13 @@ Changelog
 (dates are in the form ``DD.MM.YYYY``)
 
 
+0.0.5
+=====
+Date: 13.11.2017
+
+- allow locking during request (for thread safety)
+
+
 0.0.4
 =====
 Date: 12.07.2017
