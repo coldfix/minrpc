@@ -3,6 +3,14 @@ Changelog
 
 (dates are in the form ``DD.MM.YYYY``)
 
+0.0.6
+=====
+Date: 30.11.2017
+
+- improve error checking before/after requests
+- catch more exceptions in __del__
+- provide copyright notice as unicode
+
 
 0.0.5
 =====
