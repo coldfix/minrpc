@@ -56,7 +56,8 @@ class Client(object):
         """Close the client and the associated connection with it."""
         try:
             self.close()
-        except (RemoteProcessCrashed, RemoteProcessClosed):
+        except (RemoteProcessCrashed, RemoteProcessClosed,
+                IOError, EOFError, OSError):
             # catch ugly follow-up warnings after a MAD-X process has crashed
             pass
 
