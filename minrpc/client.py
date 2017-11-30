@@ -64,6 +64,7 @@ class Client(object):
         return self._good and not self.closed
 
     __nonzero__ = __bool__
+    good = property(__bool__)
 
     @classmethod
     def spawn_subprocess(cls, lock=None, **Popen_args):
@@ -80,10 +81,8 @@ class Client(object):
 
     def close(self):
         """Close the connection gracefully, stop the remote service."""
-        try:
+        if self.good:
             self._conn.send(('close', ()))
-        except ValueError:      # already closed
-            pass
         self._conn.close()
 
     @property
@@ -94,21 +93,15 @@ class Client(object):
     def _request(self, kind, *args):
         """Communicate with the remote service synchronously."""
         with self._lock:
+            if self.closed:     raise RemoteProcessClosed()
+            if not self._good:  raise RemoteProcessCrashed()
             try:
                 self._conn.send((kind, args))
-            except ValueError:
-                if self.closed:
-                    raise RemoteProcessClosed()
-                raise
-            except IOError:
-                self._good = False
-                raise RemoteProcessCrashed()
-            try:
                 response = self._conn.recv()
-            except EOFError:
+            except (IOError, EOFError, OSError):
                 self._good = False
+                self._conn.close()
                 raise RemoteProcessCrashed()
-            self._good = True
         return self._dispatch(response)
 
     def _dispatch(self, response):
