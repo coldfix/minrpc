@@ -97,13 +97,17 @@ class Client(object):
             if self.closed:     raise RemoteProcessClosed()
             if not self._good:  raise RemoteProcessCrashed()
             try:
-                self._conn.send((kind, args))
-                response = self._conn.recv()
+                response = self._communicate((kind, args))
             except (IOError, EOFError, OSError):
                 self._good = False
                 self._conn.close()
                 raise RemoteProcessCrashed()
         return self._dispatch(response)
+
+    def _communicate(self, message):
+        """Transmit one message and wait for the answer."""
+        self._conn.send(message)
+        return self._conn.recv()
 
     def _dispatch(self, response):
         """Dispatch an answer from the remote service."""
