@@ -123,17 +123,9 @@ class Client(object):
         """Dispatch returned data."""
         return data
 
-    @property
-    class modules(object):
-
-        """Provides access to all modules in the remote process."""
-
-        def __init__(self, client):
-            self.__client = client
-
-        def __getitem__(self, key):
-            """Get a RemoteModule object by module name."""
-            return RemoteModule(self.__client, key)
+    def get_module(self, qualname):
+        """Get proxy for module in the remote process."""
+        return RemoteModule(self, qualname)
 
 
 class RemoteModule(object):
