@@ -3,6 +3,14 @@ Changelog
 
 (dates are in the form ``DD.MM.YYYY``)
 
+0.0.7
+=====
+Date: 11.06.2018
+
+- simplify module access, backward incompatible!!
+- add overridable ``Client._communicate`` method
+
+
 0.0.6
 =====
 Date: 30.11.2017
