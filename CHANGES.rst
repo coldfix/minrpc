@@ -3,6 +3,13 @@ Changelog
 
 (dates are in the form ``DD.MM.YYYY``)
 
+0.0.8
+=====
+Date: 30.08.2018
+
+- improve error prevention during connection shutdown
+
+
 0.0.7
 =====
 Date: 11.06.2018
