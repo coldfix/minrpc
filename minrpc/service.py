@@ -61,7 +61,7 @@ class Service(object):
         """
         try:
             request = self._conn.recv()
-        except EOFError:
+        except (IOError, EOFError, OSError, ValueError):
             return False
         except KeyboardInterrupt:
             # Prevent the child process from exiting prematurely if a

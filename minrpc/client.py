@@ -57,7 +57,7 @@ class Client(object):
         try:
             self.close()
         except (RemoteProcessCrashed, RemoteProcessClosed,
-                IOError, EOFError, OSError):
+                IOError, EOFError, OSError, ValueError):
             # catch ugly follow-up warnings after a MAD-X process has crashed
             pass
 
@@ -98,7 +98,7 @@ class Client(object):
             if not self._good:  raise RemoteProcessCrashed()
             try:
                 response = self._communicate((kind, args))
-            except (IOError, EOFError, OSError):
+            except (IOError, EOFError, OSError, ValueError):
                 self._good = False
                 self._conn.close()
                 raise RemoteProcessCrashed()
