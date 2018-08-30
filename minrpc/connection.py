@@ -60,7 +60,7 @@ class Connection(object):
     @property
     def closed(self):
         """Check if the connection is fully closed."""
-        return self._recv.closed and self._send.closed
+        return self._recv.closed or self._send.closed
 
     @classmethod
     def from_fd(cls, recv_fd, send_fd):
