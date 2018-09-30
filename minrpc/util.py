@@ -42,7 +42,7 @@ class ChangeDirectory(object):
 
     def __enter__(self):
         """Enter 'with' context."""
-        pass
+        return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Exit 'with' context and restore old path."""
