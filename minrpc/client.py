@@ -141,6 +141,11 @@ class RemoteModule(object):
         self.__client = client
         self.__module = module
 
+    def __bool__(self):
+        return bool(self.__client)
+
+    __nonzero__ = __bool__
+
     def __getattr__(self, funcname):
         """Resolve all attribute accesses as remote function calls."""
         def DeferredMethod(*args, **kwargs):
