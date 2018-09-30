@@ -46,11 +46,12 @@ class Client(object):
 
     module = 'minrpc.service'
 
-    def __init__(self, conn, lock=None):
+    def __init__(self, conn, lock=None, proc=None):
         """Initialize the client with a :class:`Connection` like object."""
         self._conn = conn
         self._good = True
         self._lock = lock or NoLock()
+        self._proc = proc
 
     def __del__(self):
         """Close the client and the associated connection with it."""
@@ -78,13 +79,15 @@ class Client(object):
         """
         args = [sys.executable, '-m', cls.module]
         conn, proc = ipc.spawn_subprocess(args, **Popen_args)
-        return cls(conn, lock=lock), proc
+        return cls(conn, lock=lock, proc=proc), proc
 
     def close(self):
         """Close the connection gracefully, stop the remote service."""
         if self.good:
             self._conn.send(('close', ()))
         self._conn.close()
+        if self._proc:
+            self._proc.wait()
 
     @property
     def closed(self):
