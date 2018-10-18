@@ -25,12 +25,11 @@ install:
 
 # Actual tests:
 script:
-  - coverage run --source=minrpc    test/test_rpc.py      -v
+  - coverage run --source=minrpc -p test/test_rpc.py -v
 
 after_success:
-  - base=`python -c 'import os,minrpc; print(os.path.dirname(minrpc.__file__))'`/..
-  - mv .git .coverage $base
-  - cd $base
+  - git checkout minrpc         # restore deleted folder
+  - coverage combine
   - coveralls
 
 jobs:
