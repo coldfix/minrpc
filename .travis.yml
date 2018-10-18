@@ -3,6 +3,9 @@ language: python
 python:
   - "2.7"
   - "3.3"
+  - "3.4"
+  - "3.5"
+  - "3.6"
 
 # Build inside docker containers instead of virtual machines. These are
 # faster, start quicker and support caching.
@@ -29,3 +32,9 @@ after_success:
   - mv .git .coverage $base
   - cd $base
   - coveralls
+
+jobs:
+  include:
+    - python: "3.7"
+      dist: xenial
+      sudo: true
