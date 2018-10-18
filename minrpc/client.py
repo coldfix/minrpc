@@ -18,8 +18,10 @@ __all__ = [
 
 # Needed for py2 compatibility, otherwise could just use contextlib.ExitStack:
 class NoLock(object):
+
     def __enter__(self):
         pass
+
     def __exit__(self, *args):
         pass
 
@@ -97,8 +99,10 @@ class Client(object):
     def _request(self, kind, *args):
         """Communicate with the remote service synchronously."""
         with self._lock:
-            if self.closed:     raise RemoteProcessClosed()
-            if not self._good:  raise RemoteProcessCrashed()
+            if self.closed:
+                raise RemoteProcessClosed()
+            if not self._good:
+                raise RemoteProcessCrashed()
             try:
                 response = self._communicate((kind, args))
             except (IOError, EOFError, OSError, ValueError):

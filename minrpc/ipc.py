@@ -8,10 +8,10 @@ import os
 import subprocess
 import sys
 
+from .connection import Connection
+
 py2 = sys.version_info[0] == 2
 win = sys.platform == 'win32'
-
-from .connection import Connection
 
 if win:
     from .windows import Handle
@@ -100,8 +100,9 @@ def spawn_subprocess(argv, **Popen_args):
     args = argv + [str(int(remote_recv)), str(int(remote_send))]
     with open(os.devnull, 'w+') as devnull:
         for stream in ('stdout', 'stderr', 'stdin'):
-            # compare to `False` as opposed to `None`:
-            if Popen_args.get(stream) == False:
+            # Check whether it was explicitly disabled (`False`) rather than
+            # simply not specified (`None`)?
+            if Popen_args.get(stream) is False:
                 Popen_args[stream] = devnull
         proc = subprocess.Popen(args, close_fds=False, **Popen_args)
     conn.send(_get_open_file_handles())
