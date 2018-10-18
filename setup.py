@@ -48,10 +48,8 @@ def get_setup_args():
         url=metadata['__uri__'],
         license=metadata['__license__'],
         classifiers=metadata['__classifiers__'],
-        packages = [
-            "minrpc",
-        ],
-        include_package_data=True, # include files matched by MANIFEST.in
+        packages=["minrpc"],
+        include_package_data=True,  # include files matched by MANIFEST.in
         install_requires=[
             'setuptools',
         ],

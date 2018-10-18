@@ -15,16 +15,19 @@ install:
   - python setup.py sdist
   - pip install ./dist/*.tar.gz
 
-  # Safeguard against importing from local folder:
-  - rm -r minrpc
-
-  - pip install nose coverage coveralls
+  - pip install coverage coveralls
+  - pip install flake8 docutils pygments
 
 script:
+  - python setup.py check -rs
+  - flake8
+
+  # Safeguard against importing from local folder:
+  - mv minrpc _minrpc
   - coverage run --source=minrpc -p test/test_rpc.py -v
+  - mv _minrpc minrpc
 
 after_success:
-  - git checkout minrpc         # restore deleted folder
   - coverage combine
   - coveralls
 

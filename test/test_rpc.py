@@ -2,7 +2,6 @@ from __future__ import absolute_import
 
 # standard library
 import os
-import subprocess
 import tempfile
 import unittest
 
