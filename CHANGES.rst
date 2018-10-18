@@ -3,6 +3,18 @@ Changelog
 
 (dates are in the form ``DD.MM.YYYY``)
 
+0.0.10
+======
+Date: 18.10.2018
+
+Pure maintenance release with continuous integration improvements:
+
+- automatically upload release to PyPI
+- add automatic style and sanity checks
+- fix some style issues
+- cleanup in .travis.yml
+
+
 0.0.9
 =====
 Date: 18.10.2018
