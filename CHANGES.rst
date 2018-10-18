@@ -3,6 +3,16 @@ Changelog
 
 (dates are in the form ``DD.MM.YYYY``)
 
+0.0.9
+=====
+Date: 18.10.2018
+
+- add ``__bool__`` for ``RemoteModule`` indicating whether the connection has
+  been closed
+- return ``self`` from ``ChangeDirectory.__enter__``
+- wait for subprocess completion in ``Client.close()``
+
+
 0.0.8
 =====
 Date: 30.08.2018
