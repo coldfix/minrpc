@@ -36,3 +36,40 @@ jobs:
     - python: "3.7"
       dist: xenial
       sudo: true
+
+    - stage: deploy
+      name: Upload release to Test PyPI
+      python: "3.6"
+      if: branch = test-release
+      install: skip
+      script:
+        - sed -i "/^__version__ = /s/'$/.dev$TRAVIS_BUILD_NUMBER'/"
+            minrpc/__init__.py
+        - python setup.py sdist
+      after_success: true
+      deploy:
+      - provider: pypi
+        skip_cleanup: true
+        server: https://test.pypi.org/legacy/
+        on:
+          branch: test-release
+        user: hibtc-deploy
+        password:
+          secure: "OWT/ZvPKHDmY6iDlhpjGAOdK/rv2UCRj66fxb1Sn7NCMedddJnXgdKNSfJ44qaiwXp1uS9fJPbTSiUbuJb2FlqHcVXIyt1DWu/tNokHNJPpERZkpWEiEpmwgX7G7vdWsoihje6ejDbFK70tuyE/sMRK7d8wOKmSDMxHwuk55L+VesuEQxX4PHUUFq9FPd8rdYEfa1AgEZAdB5R3At6htK/WMZT2o1GtPjOuQJghwLv1lDqMNsh2UvhMOBGopvxAJFK6CZ+0K5x7LsHOLk2YtXD/1PmwbG/kXMNZUor7i87kFXbaAA6QpYmwE6MMUbzJJjdAunajY29iWbNjyaIbhntTH7vP7xH3McghWAeFPJvzNss5vkhBjTcV0cgq83nIO0DtgbqYWJlBRxejxGCUDPa188Usvp3tJVmzA8/dqrgk9JsYFr7EGMTwj1Vg0Ot7M9GgZygCpQUxytPAqv2R/vt42ll6EkcloW04vDANm8UBL2qHIpjMrAMpNlvmXW0L8TUSK7Nw88fyexZRLtvd8Sj5KNR8v1omCnQri8kG9P6L9DdwQocFL7rf0HiNcZjUvvR3jz62TLV+eT0zFKHFWEgJeP5F8e0ebRo6UqEFq2zOshLYN9Lkb8rQxOPKSsdkXvkoMVAi2yF3zbvX+Mr0D8rTK3MmFsx4m7XSmo9iPLBw="
+
+    - stage: deploy
+      name: Upload release to PyPI
+      python: "3.6"
+      if: tag IS present
+      install: skip
+      script:
+        - python setup.py sdist
+      after_success: true
+      deploy:
+      - provider: pypi
+        skip_cleanup: true
+        on:
+          tags: true
+        user: hibtc-deploy
+        password:
+          secure: "fadvBpzVwzzxLKIFdi4uMmDYWUbmFHS5CTkN4yEs/K1a4ZgaxGn9HRkuE+sZ0YCk+7dCAsquWKtIxxt0lUNeRs3FigjDUTMdsTE2/7NqB0DGzFk1PqC8A/DPig8EmcntWaP6ecMQBC97xM74tWNgs4gslqvOllmENDHoEy416UqB5e5V8NpygceSB9CztJL1dGDgLGijnFJTSzNVFekto5K5QD3LPfxFT07sJQpso09o+JVZ54PfA7hxllu8PxgP4hilt3OSxy0j9aOpDIdC8UGbnkC+SX8ZFWRtys/eiRHRU4DhQ2UE2TWD9cnokHbTwZdtVXvd3tHPcqOdJDltaLv61fZvi0DaQqq+TeIGH27FWbvop4gnfmiDrfNROT034Yv0qviYhF77/kXzPDJXntF2h/TkdWUXHOTjq6sQscg0+FTXDc1KVal5Nw7E1bN+xRZk+Q/k1taL75/6sgC6u2UYD5HtQzLC6XCzwzPwO/UMRhiahPVh505AgNCAdKXF4rfy1/l+JYa2oBU9k7eJJFaAeJUcryYbo8bOEdO0zP4JMYT+oo6BN2i3lGgpmfiECV14Br8LVRj9CHknXJdj+tfYzPbUkVn4a7BqX0p0MVrH60OI9akaW7xHgX3uiIi5fmNo5Hgk0Zi/cl9VYnSZltQtGpdgvYVS1rAcRqPrOGA="
