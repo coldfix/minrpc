@@ -7,23 +7,19 @@ python:
   - "3.5"
   - "3.6"
 
-# Build inside docker containers instead of virtual machines. These are
-# faster, start quicker and support caching.
+dist: trusty
 sudo: false
 
-# Setup (performed within virtualenv)
 install:
-  # Check that the source distribution can be used for installation -
-  # without having *any* dependencies installed:
+  # Use [-> test!!] the source distribution as installation medium:
   - python setup.py sdist
-  - pip install $(ls ./dist/*.tar.gz | sort -rV | head -n1)
-  # Need to remove minrpc folder otherwise it will be imported, but we want
-  # to check the version installed from the source distribution:
+  - pip install ./dist/*.tar.gz
+
+  # Safeguard against importing from local folder:
   - rm -r minrpc
 
   - pip install nose coverage coveralls
 
-# Actual tests:
 script:
   - coverage run --source=minrpc -p test/test_rpc.py -v
 
