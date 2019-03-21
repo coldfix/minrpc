@@ -42,8 +42,7 @@ jobs:
       if: branch = test-release
       install: skip
       script:
-        - sed -i "/^__version__ = /s/'$/.dev$TRAVIS_BUILD_NUMBER'/"
-            minrpc/__init__.py
+        - echo -e "\n[egg_info]\ntag-build = dev$TRAVIS_BUILD_NUMBER" >> setup.cfg
         - python setup.py sdist
       after_success: true
       deploy:
