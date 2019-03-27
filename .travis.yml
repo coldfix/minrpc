@@ -1,24 +1,23 @@
 language: python
-
 python:
   - "2.7"
   - "3.4"
   - "3.5"
   - "3.6"
-
-dist: trusty
-sudo: false
+  - "3.7"
+dist: xenial
 
 install:
-  # Use [-> test!!] the source distribution as installation medium:
-  - python setup.py sdist
-  - pip install ./dist/*.tar.gz
+  - if [[ -n $TRAVIS_TAG ]]; then unset BUILD_TAG TWINE_REPOSITORY_URL; fi
+  # Use [-> test!!] the wheel as installation medium:
+  - python setup.py egg_info -b "$BUILD_TAG" sdist bdist_wheel
+  - pip install dist/*.whl
 
   - pip install coverage coveralls
-  - pip install flake8 docutils pygments
+  - pip install twine flake8 docutils pygments
 
 script:
-  - python setup.py check -rs
+  - twine check dist/*
   - flake8
 
   # Safeguard against importing from local folder:
@@ -32,42 +31,15 @@ after_success:
 
 jobs:
   include:
-    - python: "3.7"
-      dist: xenial
-      sudo: true
-
-    - stage: deploy
-      name: Upload release to Test PyPI
-      python: "3.6"
-      if: branch = test-release
-      install: skip
-      script:
-        - echo -e "\n[egg_info]\ntag-build = dev$TRAVIS_BUILD_NUMBER" >> setup.cfg
-        - python setup.py sdist
-      after_success: true
-      deploy:
-      - provider: pypi
-        skip_cleanup: true
-        server: https://test.pypi.org/legacy/
-        on:
-          branch: test-release
-        user: hibtc-deploy
-        password:
-          secure: "OWT/ZvPKHDmY6iDlhpjGAOdK/rv2UCRj66fxb1Sn7NCMedddJnXgdKNSfJ44qaiwXp1uS9fJPbTSiUbuJb2FlqHcVXIyt1DWu/tNokHNJPpERZkpWEiEpmwgX7G7vdWsoihje6ejDbFK70tuyE/sMRK7d8wOKmSDMxHwuk55L+VesuEQxX4PHUUFq9FPd8rdYEfa1AgEZAdB5R3At6htK/WMZT2o1GtPjOuQJghwLv1lDqMNsh2UvhMOBGopvxAJFK6CZ+0K5x7LsHOLk2YtXD/1PmwbG/kXMNZUor7i87kFXbaAA6QpYmwE6MMUbzJJjdAunajY29iWbNjyaIbhntTH7vP7xH3McghWAeFPJvzNss5vkhBjTcV0cgq83nIO0DtgbqYWJlBRxejxGCUDPa188Usvp3tJVmzA8/dqrgk9JsYFr7EGMTwj1Vg0Ot7M9GgZygCpQUxytPAqv2R/vt42ll6EkcloW04vDANm8UBL2qHIpjMrAMpNlvmXW0L8TUSK7Nw88fyexZRLtvd8Sj5KNR8v1omCnQri8kG9P6L9DdwQocFL7rf0HiNcZjUvvR3jz62TLV+eT0zFKHFWEgJeP5F8e0ebRo6UqEFq2zOshLYN9Lkb8rQxOPKSsdkXvkoMVAi2yF3zbvX+Mr0D8rTK3MmFsx4m7XSmo9iPLBw="
-
     - stage: deploy
       name: Upload release to PyPI
       python: "3.6"
-      if: tag IS present
-      install: skip
-      script:
-        - python setup.py sdist
+      if: tag is present OR branch = test-release
+      script: twine upload dist/*
       after_success: true
-      deploy:
-      - provider: pypi
-        skip_cleanup: true
-        on:
-          tags: true
-        user: hibtc-deploy
-        password:
-          secure: "fadvBpzVwzzxLKIFdi4uMmDYWUbmFHS5CTkN4yEs/K1a4ZgaxGn9HRkuE+sZ0YCk+7dCAsquWKtIxxt0lUNeRs3FigjDUTMdsTE2/7NqB0DGzFk1PqC8A/DPig8EmcntWaP6ecMQBC97xM74tWNgs4gslqvOllmENDHoEy416UqB5e5V8NpygceSB9CztJL1dGDgLGijnFJTSzNVFekto5K5QD3LPfxFT07sJQpso09o+JVZ54PfA7hxllu8PxgP4hilt3OSxy0j9aOpDIdC8UGbnkC+SX8ZFWRtys/eiRHRU4DhQ2UE2TWD9cnokHbTwZdtVXvd3tHPcqOdJDltaLv61fZvi0DaQqq+TeIGH27FWbvop4gnfmiDrfNROT034Yv0qviYhF77/kXzPDJXntF2h/TkdWUXHOTjq6sQscg0+FTXDc1KVal5Nw7E1bN+xRZk+Q/k1taL75/6sgC6u2UYD5HtQzLC6XCzwzPwO/UMRhiahPVh505AgNCAdKXF4rfy1/l+JYa2oBU9k7eJJFaAeJUcryYbo8bOEdO0zP4JMYT+oo6BN2i3lGgpmfiECV14Br8LVRj9CHknXJdj+tfYzPbUkVn4a7BqX0p0MVrH60OI9akaW7xHgX3uiIi5fmNo5Hgk0Zi/cl9VYnSZltQtGpdgvYVS1rAcRqPrOGA="
+      env:
+        - BUILD_TAG=dev$TRAVIS_BUILD_NUMBER
+        - TWINE_REPOSITORY_URL=https://test.pypi.org/legacy/
+        - TWINE_USERNAME=hibtc-deploy
+        # TWINE_PASSWORD
+        - secure: "bGVhGeCTN56kZi5gYiqOAiKbj6kaDTMg5oeM1ENjvxp5X1TIVurIP1ucWyu88THLFno0zW69EadntXCKhM22kvCHYly+k8d1VOzKCE8nt4FemGIt+HGVSwollKuatIhwUop5QhtxEu3MmxOScxZWfelatOE/z8r3gRZyi0VBNwlEcyhavBfyJyhNBDcCAEj7i/BLnse37em/rrrHI0h6ZFAxuufEWyZ7DWienv6ZxRF2XJUfTZ0yMueBCtBHn9io73ueAeCWm6EWFYv3tiZldjhsNS7+r/eSWkuxHAl/YqwRLlsLOEFCxRGGwAC0s2TNLS4+XGblRLSUtB87227/gMbJR08Ris6mtY151egpKNFqgy//asHmbedBHDPSZfQyDmc+Ygq+fjsVpHaHXA5A1PZiUtqxrSJOGprCUP4yd39j06ccf4fCEjUO3BjRBFz7UV4lLZSQTUGLNdQ+LQccljsujRfRDzxCZTbKVpGaPcEd1dNaFK6tS09QwtnUn5HmNcLoDDQk1kP69sJhM3nWRP3zaL7E8UvmL41mpf+ZMuT//4mytf4f6dmmVfoFj98pSFac8Lz7B0ErkKdWpMo9pAXUOEBdKtQpPqc8yl6KOYfXnfuIqKmrNmyO/u7ZWjDdz+vf2SPzZBI0ulVdN7g3QHzwMBYK2/oJPRMl3e63mFk="
