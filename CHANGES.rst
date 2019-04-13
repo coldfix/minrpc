@@ -3,6 +3,15 @@ Changelog
 
 (dates are in the form ``DD.MM.YYYY``)
 
+0.0.11
+======
+Date: 13.04.2019
+
+- remove obsolete OrderedDict export
+- simplifications in build/setup scripts
+- remove py33 tests
+
+
 0.0.10
 ======
 Date: 18.10.2018
