@@ -3,6 +3,14 @@ Changelog
 
 (dates are in the form ``DD.MM.YYYY``)
 
+0.1.0
+=====
+Date: 28.10.2020
+
+- fix UnpicklingError: pickle data was truncated
+  see: https://github.com/hibtc/cpymad/issues/72
+
+
 0.0.11
 ======
 Date: 13.04.2019
