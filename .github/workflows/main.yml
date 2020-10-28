@@ -40,10 +40,7 @@ jobs:
       - run: twine check dist/*
       - run: flake8
 
-      # Safeguard against importing from local folder:
-      - run: mv minrpc _minrpc
       - run: coverage run --source=minrpc -p test/test_rpc.py -v
-      - run: mv _minrpc minrpc
 
       - run: coverage combine
       - run: coveralls
