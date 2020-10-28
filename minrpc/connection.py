@@ -5,6 +5,7 @@ IPC connection.
 from __future__ import absolute_import
 
 import os
+from struct import Struct
 
 try:
     # python2's cPickle is an accelerated (C extension) version of pickle:
@@ -19,6 +20,8 @@ except ImportError:
 __all__ = [
     'Connection',
 ]
+
+HEADER = Struct("!L")
 
 
 class Connection(object):
@@ -44,13 +47,17 @@ class Connection(object):
 
     def recv(self):
         """Receive a pickled message from the remote end."""
-        return pickle.load(self._recv)
+        header = read(self._recv, HEADER.size)
+        payload = read(self._recv, *HEADER.unpack(header))
+        return pickle.loads(payload)
 
     def send(self, data):
         """Send a pickled message to the remote end."""
         # '-1' instructs pickle to use the latest protocol version. This
         # improves performance by a factor ~50-100 in my tests:
-        return pickle.dump(data, self._send, -1)
+        payload = pickle.dumps(data, -1)
+        self._send.write(HEADER.pack(len(payload)))
+        self._send.write(payload)
 
     def close(self):
         """Close the connection."""
@@ -67,3 +74,15 @@ class Connection(object):
         """Create a connection from two file descriptors."""
         return cls(os.fdopen(recv_fd, 'rb', 0),
                    os.fdopen(send_fd, 'wb', 0))
+
+
+def read(file, size):
+    """Read a fixed size buffer from """
+    parts = []
+    while size > 0:
+        part = file.read(size)
+        if not part:
+            raise EOFError
+        parts.append(part)
+        size -= len(part)
+    return b''.join(parts)
