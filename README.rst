@@ -1,16 +1,16 @@
 minrpc
 ------
 
-|Version| |License| |Python| |Build| |Coverage|
+|Version| |License| |Python| |Tests| |Coverage|
 
 Minimalistic RPC utility.
 
 Please do not use. This package is only used within cpymad and pytao.
 
 
-.. |Build| image::      https://api.travis-ci.org/hibtc/minrpc.svg?branch=master
-   :target:             https://travis-ci.org/hibtc/minrpc
-   :alt:                Build Status
+.. |Tests| image::      https://github.com/coldfix/minrpc/workflows/Tests/badge.svg
+   :target:             https://github.com/coldfix/minrpc/actions?query=Tests
+   :alt:                GitHub Actions Status
 
 .. |Coverage| image::   https://coveralls.io/repos/hibtc/minrpc/badge.svg?branch=master
    :target:             https://coveralls.io/r/hibtc/minrpc
