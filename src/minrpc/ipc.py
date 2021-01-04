@@ -10,7 +10,6 @@ import sys
 
 from .connection import Connection
 
-py2 = sys.version_info[0] == 2
 win = sys.platform == 'win32'
 
 if win:
@@ -25,24 +24,6 @@ __all__ = [
     'spawn_subprocess',
     'prepare_subprocess_ipc',
 ]
-
-
-# On python2/windows, open() creates a non-inheritable file descriptor with an
-# underlying inheritable file HANDLE. Therefore, we need to keep track of all
-# open files to close their handles in the remote process:
-if win and py2:
-    from . import file_monitor
-
-    file_monitor.monkey_patch()
-
-    def _get_open_file_handles():
-        """Return open file handles as list of ints."""
-        return [int(Handle.from_fd(f.fileno(), own=False))
-                for f in file_monitor.File._instances if not f.closed]
-
-else:
-    def _get_open_file_handles():
-        return []
 
 
 def get_max_fd():
@@ -105,7 +86,6 @@ def spawn_subprocess(argv, **Popen_args):
             if Popen_args.get(stream) is False:
                 Popen_args[stream] = devnull
         proc = subprocess.Popen(args, close_fds=False, **Popen_args)
-    conn.send(_get_open_file_handles())
     # wait for subprocess to confirm that all handles are closed:
     if conn.recv() != 'ready':
         raise RuntimeError
@@ -126,11 +106,5 @@ def prepare_subprocess_ipc(args):
                    sys.stdout.fileno(),
                    sys.stderr.fileno(),
                    recv_fd, send_fd])
-    # On python2/windows open() creates a non-inheritable file descriptor with
-    # an underlying inheritable file HANDLE. Since HANDLEs can't be closed
-    # with os.closerange, the following snippet is needed to prevent them from
-    # staying open in the remote process:
-    for handle in conn.recv():
-        Handle(handle).close()
     conn.send('ready')
     return conn

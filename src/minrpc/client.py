@@ -5,6 +5,7 @@ RPC client utilities.
 from __future__ import absolute_import
 
 import sys
+import contextlib
 
 from . import ipc
 
@@ -14,16 +15,6 @@ __all__ = [
     'RemoteProcessCrashed',
     'Client',
 ]
-
-
-# Needed for py2 compatibility, otherwise could just use contextlib.ExitStack:
-class NoLock(object):
-
-    def __enter__(self):
-        pass
-
-    def __exit__(self, *args):
-        pass
 
 
 class RemoteProcessClosed(RuntimeError):
@@ -52,7 +43,7 @@ class Client(object):
         """Initialize the client with a :class:`Connection` like object."""
         self._conn = conn
         self._good = True
-        self._lock = lock or NoLock()
+        self._lock = lock or contextlib.ExitStack()
         self._proc = proc
 
     def __del__(self):

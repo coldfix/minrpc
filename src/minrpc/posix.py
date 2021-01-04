@@ -12,15 +12,6 @@ __all__ = [
 ]
 
 
-try:
-    # python3: handles must be made inheritable explicitly:
-    _set_inheritable = os.set_inheritable
-except AttributeError:
-    # python2: handles are inheritable by default, so nothing to do
-    def _set_inheritable(fd, inheritable):
-        pass
-
-
 class Handle(object):
 
     """
@@ -79,5 +70,5 @@ class Handle(object):
     def dup_inheritable(self):
         """Make the file descriptor inheritable."""
         dup = os.dup(self.handle)
-        _set_inheritable(dup, True)
+        os.set_inheritable(dup, True)
         return self.__class__(dup)

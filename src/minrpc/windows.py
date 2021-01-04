@@ -4,35 +4,13 @@ Windows specific low level stuff.
 
 from __future__ import absolute_import
 
-import sys
 import msvcrt
-
-py2 = sys.version_info[0] == 2
-if py2:
-    import _subprocess as _winapi
-    import _multiprocessing
-    _CloseHandle = _multiprocessing.win32.CloseHandle
-else:
-    import _winapi
-    _CloseHandle = _winapi.CloseHandle
+import _winapi
 
 
 __all__ = [
     'Handle',
 ]
-
-
-if py2:
-    # _subprocess.DuplicateHandle and _subprocess.CreatePipe return a
-    # handle object similar to the type defined below.
-    def _unwrap(handle):
-        return handle.Detach()
-
-else:
-    # _winapi.DuplicateHandle and _winapi.CreatePipe return plain integers
-    # which can be used directly.
-    def _unwrap(handle):
-        return handle
 
 
 class Handle(object):
@@ -63,7 +41,7 @@ class Handle(object):
         # does when requesting PIPE streams. This is the easiest and most
         # reliable method I have tested so far:
         recv, send = _winapi.CreatePipe(None, 0)
-        return cls(_unwrap(recv)), cls(_unwrap((send)))
+        return cls(recv), cls(send)
 
     def __int__(self):
         """Get the underlying handle."""
@@ -84,7 +62,7 @@ class Handle(object):
     def close(self):
         """Close the handle."""
         if self.own and self.handle is not None:
-            _CloseHandle(self.handle)
+            _winapi.CloseHandle(self.handle)
             self.handle = None
 
     def detach_fd(self):
@@ -102,12 +80,12 @@ class Handle(object):
         # new handles are created uninheritable by default, but they can be
         # made inheritable on duplication:
         current_process = _winapi.GetCurrentProcess()
-        dup = _unwrap(_winapi.DuplicateHandle(
+        dup = _winapi.DuplicateHandle(
             current_process,                # source process
             self.handle,                    # source handle
             current_process,                # target process
             0,                              # desired access
             True,                           # inheritable
             _winapi.DUPLICATE_SAME_ACCESS,  # options
-        ))
+        )
         return self.__class__(dup)

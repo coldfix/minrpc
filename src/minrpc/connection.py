@@ -6,15 +6,7 @@ from __future__ import absolute_import
 
 import os
 from struct import Struct
-
-try:
-    # python2's cPickle is an accelerated (C extension) version of pickle:
-    import cPickle as pickle
-except ImportError:
-    # python3's pickle automatically uses the accelerated version and falls
-    # back to the python version, see:
-    # http://docs.python.org/3.3/whatsnew/3.0.html?highlight=cpickle
-    import pickle
+import pickle
 
 
 __all__ = [
