@@ -2,8 +2,6 @@
 RPC service utilities.
 """
 
-from __future__ import absolute_import
-
 import logging
 import traceback
 import sys
