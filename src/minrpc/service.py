@@ -2,6 +2,7 @@
 RPC service utilities.
 """
 
+import importlib
 import logging
 import traceback
 import sys
@@ -94,9 +95,7 @@ class Service(object):
 
     def _dispatch_function_call(self, modname, funcname, args, kwargs):
         """Execute any static function call in the remote process."""
-        # As soon as we drop support for python2.6, we should replace this
-        # with importlib.import_module:
-        module = __import__(modname, None, None, '*')
+        module = importlib.import_module(modname)
         function = getattr(module, funcname)
         return function(*args, **kwargs)
 
