@@ -3,6 +3,14 @@ Changelog
 
 (dates are in the form ``DD.MM.YYYY``)
 
+0.2.0
+=====
+Date: 17.09.2025
+
+- drop support with python < 3.4
+- avoid call to os.closerange to fix starting overhead in cpymad
+
+
 0.1.0
 =====
 Date: 28.10.2020
