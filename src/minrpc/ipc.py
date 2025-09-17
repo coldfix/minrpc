@@ -28,9 +28,9 @@ def get_max_fd():
     """Return the maximum possible file descriptor or a wild guess."""
     if not win:
         import resource
-        _soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
-        if hard != resource.RLIM_INFINITY:
-            return hard
+        soft, _hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+        if soft != resource.RLIM_INFINITY:
+            return soft
     try:
         return subprocess.MAXFD
     except AttributeError:          # on py3.5
