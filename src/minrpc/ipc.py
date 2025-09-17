@@ -17,37 +17,10 @@ else:
 
 
 __all__ = [
-    'close_all_but',
     'create_ipc_connection',
     'spawn_subprocess',
     'prepare_subprocess_ipc',
 ]
-
-
-def get_max_fd():
-    """Return the maximum possible file descriptor or a wild guess."""
-    if not win:
-        import resource
-        soft, _hard = resource.getrlimit(resource.RLIMIT_NOFILE)
-        if soft != resource.RLIM_INFINITY:
-            return soft
-    try:
-        return subprocess.MAXFD
-    except AttributeError:          # on py3.5
-        return 4096
-
-
-def close_all_but(keep):
-    """Close all but the given file descriptors."""
-    # first, let the garbage collector run, it may find some unreachable
-    # file objects (on posix forked processes) and close them:
-    import gc
-    gc.collect()
-    # close all ranges in between the file descriptors to be kept:
-    keep = sorted(set([-1] + keep + [get_max_fd()]))
-    for s, e in zip(keep[:-1], keep[1:]):
-        if s+1 < e:
-            os.closerange(s+1, e)
 
 
 def create_ipc_connection():
@@ -100,9 +73,5 @@ def prepare_subprocess_ipc(args):
     recv_fd = handles[0].detach_fd()
     send_fd = handles[1].detach_fd()
     conn = Connection.from_fd(recv_fd, send_fd)
-    close_all_but([sys.stdin.fileno(),
-                   sys.stdout.fileno(),
-                   sys.stderr.fileno(),
-                   recv_fd, send_fd])
     conn.send('ready')
     return conn
